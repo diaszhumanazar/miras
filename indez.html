@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHRONOS — Уақыт өнері</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600;700&family=Raleway:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c878;
+    --gold-dim: #8a6e30;
+    --black: #080808;
+    --deep: #0e0d0b;
+    --charcoal: #1a1915;
+    --warm-white: #f5f0e8;
+    --cream: #ede8dc;
+    --text-muted: #8a8070;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--warm-white);
+    font-family: 'Raleway', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s ease;
+    transform: translate(-50%, -50%);
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.25s ease, width 0.3s, height 0.3s, border-color 0.3s;
+    transform: translate(-50%, -50%);
+  }
+  body:hover .cursor-ring.hover { width: 60px; height: 60px; border-color: var(--gold); }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 28px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(to bottom, rgba(8,8,8,0.95), transparent);
+    backdrop-filter: blur(2px);
+  }
+  .logo {
+    font-family: 'Cinzel', serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    text-decoration: none;
+  }
+  .logo span { color: var(--warm-white); }
+  .nav-links {
+    display: flex;
+    gap: 48px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-cart {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 300;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid var(--gold-dim);
+    padding: 10px 24px;
+    text-decoration: none;
+    transition: all 0.3s;
+  }
+  .nav-cart:hover { background: var(--gold); color: var(--black); }
+
+  /* HERO */
+  .hero {
+    height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 60% 80% at 70% 50%, rgba(201,168,76,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 20% 80%, rgba(201,168,76,0.05) 0%, transparent 50%),
+      var(--black);
+  }
+  .hero-grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 200px;
+  }
+  .hero-line {
+    position: absolute;
+    top: 50%;
+    left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold-dim), transparent);
+    opacity: 0.3;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 0 60px;
+    max-width: 700px;
+    animation: heroFadeIn 1.8s ease forwards;
+  }
+  @keyframes heroFadeIn {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-label {
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .hero-label::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(4rem, 8vw, 7.5rem);
+    font-weight: 300;
+    line-height: 0.9;
+    margin-bottom: 32px;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+  .hero-sub {
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    max-width: 360px;
+    line-height: 2;
+    margin-bottom: 56px;
+  }
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 20px;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 300;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--warm-white);
+    text-decoration: none;
+    transition: all 0.4s;
+  }
+  .hero-cta .cta-line {
+    width: 60px; height: 1px;
+    background: var(--gold);
+    transition: width 0.4s;
+  }
+  .hero-cta:hover .cta-line { width: 100px; }
+  .hero-cta:hover { color: var(--gold); }
+
+  .hero-watch {
+    position: absolute;
+    right: -5%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 52vw;
+    max-width: 780px;
+    opacity: 0;
+    animation: watchReveal 2.2s ease 0.3s forwards;
+  }
+  @keyframes watchReveal {
+    from { opacity: 0; transform: translateY(-50%) translateX(60px) rotate(5deg); }
+    to { opacity: 1; transform: translateY(-50%) translateX(0) rotate(0deg); }
+  }
+
+  /* SVG Watch Face */
+  .watch-svg { width: 100%; height: auto; filter: drop-shadow(0 40px 80px rgba(201,168,76,0.2)); }
+
+  /* MARQUEE */
+  .marquee-section {
+    overflow: hidden;
+    border-top: 1px solid rgba(201,168,76,0.15);
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    padding: 20px 0;
+    background: var(--charcoal);
+  }
+  .marquee-track {
+    display: flex;
+    gap: 0;
+    animation: marquee 20s linear infinite;
+    white-space: nowrap;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .marquee-item {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+  .marquee-item::after {
+    content: '◆';
+    color: var(--gold);
+    font-size: 0.5rem;
+  }
+
+  /* FEATURED */
+  .section { padding: 140px 60px; }
+  .section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 80px;
+  }
+  .section-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .section-label::before {
+    content: '';
+    width: 30px; height: 1px;
+    background: var(--gold);
+    display: block;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    font-weight: 300;
+    line-height: 1.1;
+  }
+  .section-title em { font-style: italic; color: var(--gold); }
+  .view-all {
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    border-bottom: 1px solid var(--gold-dim);
+    padding-bottom: 4px;
+    transition: all 0.3s;
+    white-space: nowrap;
+    margin-bottom: 8px;
+  }
+  .view-all:hover { color: var(--warm-white); border-color: var(--warm-white); }
+
+  .watches-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .watch-card {
+    background: var(--charcoal);
+    position: relative;
+    overflow: hidden;
+    cursor: none;
+    group: true;
+  }
+  .watch-card:first-child { grid-row: span 2; }
+  .watch-visual {
+    aspect-ratio: 1;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #141210 0%, #1e1b15 50%, #0f0e0c 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .watch-card:first-child .watch-visual { aspect-ratio: unset; height: 100%; min-height: 500px; }
+  .watch-visual-inner {
+    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .watch-card:hover .watch-visual-inner { transform: scale(1.06) rotate(3deg); }
+
+  .watch-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(201,168,76,0.12), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+  .watch-card:hover .watch-glow { opacity: 1; }
+
+  .watch-info {
+    padding: 28px 32px 32px;
+    background: var(--charcoal);
+    border-top: 1px solid rgba(201,168,76,0.1);
+  }
+  .watch-brand {
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .watch-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    margin-bottom: 6px;
+  }
+  .watch-desc {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    margin-bottom: 20px;
+    line-height: 1.7;
+  }
+  .watch-price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .watch-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: var(--gold);
+  }
+  .watch-price sup {
+    font-size: 0.8rem;
+    vertical-align: super;
+    margin-right: 2px;
+  }
+  .add-btn {
+    width: 44px; height: 44px;
+    border: 1px solid var(--gold-dim);
+    background: transparent;
+    color: var(--gold);
+    font-size: 1.3rem;
+    cursor: none;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .add-btn:hover { background: var(--gold); color: var(--black); }
+
+  /* PHILOSOPHY */
+  .philosophy {
+    padding: 160px 60px;
+    background: var(--charcoal);
+    position: relative;
+    overflow: hidden;
+  }
+  .philosophy-bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Cinzel', serif;
+    font-size: clamp(6rem, 15vw, 18rem);
+    font-weight: 700;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(201,168,76,0.06);
+    white-space: nowrap;
+    pointer-events: none;
+    letter-spacing: 0.1em;
+  }
+  .philosophy-inner {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 100px;
+    align-items: center;
+  }
+  .philosophy-text .section-label { margin-bottom: 20px; }
+  .philosophy-quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.4;
+    color: var(--warm-white);
+    margin: 32px 0;
+  }
+  .philosophy-quote em { color: var(--gold); font-style: normal; }
+  .philosophy-body {
+    font-size: 0.8rem;
+    line-height: 2;
+    color: var(--text-muted);
+    max-width: 440px;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+  .stat-box {
+    background: rgba(201,168,76,0.05);
+    border: 1px solid rgba(201,168,76,0.12);
+    padding: 40px;
+    text-align: center;
+    transition: all 0.4s;
+  }
+  .stat-box:hover { background: rgba(201,168,76,0.1); border-color: var(--gold); }
+  .stat-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3.5rem;
+    font-weight: 300;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+  .stat-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* COLLECTION BANNER */
+  .banner {
+    padding: 0 60px 140px;
+    position: relative;
+  }
+  .banner-inner {
+    background: linear-gradient(135deg, #1a1510 0%, #0e0d0b 40%, #1a1510 100%);
+    border: 1px solid rgba(201,168,76,0.2);
+    padding: 80px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .banner-inner::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(ellipse at 30% 50%, rgba(201,168,76,0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .banner-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 3.5vw, 3.5rem);
+    font-weight: 300;
+    line-height: 1.1;
+    margin-bottom: 24px;
+  }
+  .banner-title em { font-style: italic; color: var(--gold); }
+  .banner-text {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 2;
+    margin-bottom: 40px;
+  }
+  .gold-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--gold);
+    color: var(--black);
+    font-family: 'Raleway', sans-serif;
+    font-weight: 400;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    padding: 18px 40px;
+    text-decoration: none;
+    transition: all 0.4s;
+  }
+  .gold-btn:hover { background: var(--gold-light); }
+  .banner-features {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  .feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid rgba(201,168,76,0.1);
+  }
+  .feature-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .feature-icon {
+    width: 48px; height: 48px;
+    border: 1px solid rgba(201,168,76,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .feature-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+  .feature-desc {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    line-height: 1.8;
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--charcoal);
+    border-top: 1px solid rgba(201,168,76,0.15);
+    padding: 80px 60px 40px;
+  }
+  .footer-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 60px;
+    margin-bottom: 60px;
+  }
+  .footer-brand .logo { font-size: 1.2rem; }
+  .footer-tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--text-muted);
+    margin-top: 16px;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  .footer-col h4 {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 24px;
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col ul li { margin-bottom: 12px; }
+  .footer-col ul li a {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.3s;
+  }
+  .footer-col ul li a:hover { color: var(--gold); }
+  .footer-bottom {
+    border-top: 1px solid rgba(201,168,76,0.1);
+    padding-top: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-copy {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+  }
+  .footer-socials {
+    display: flex;
+    gap: 24px;
+  }
+  .footer-socials a {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(201,168,76,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-decoration: none;
+    transition: all 0.3s;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0;
+  }
+  .footer-socials a:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* Scroll reveal */
+  .reveal { opacity: 0; transform: translateY(30px); transition: all 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 1024px) {
+    nav { padding: 24px 32px; }
+    .nav-links { display: none; }
+    .section, .philosophy, .banner { padding: 80px 32px; }
+    .hero-content { padding: 0 32px; }
+    .hero-watch { display: none; }
+    .watches-grid { grid-template-columns: 1fr 1fr; }
+    .watch-card:first-child { grid-row: auto; }
+    .philosophy-inner { grid-template-columns: 1fr; gap: 60px; }
+    .banner-inner { grid-template-columns: 1fr; padding: 48px; }
+    .footer-top { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 640px) {
+    .watches-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .footer-top { grid-template-columns: 1fr; }
+    .section-header { flex-direction: column; align-items: flex-start; gap: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">CHRONOS<span> ◆</span></a>
+  <ul class="nav-links">
+    <li><a href="#">Коллекция</a></li>
+    <li><a href="#">Бренд</a></li>
+    <li><a href="#">Сервис</a></li>
+    <li><a href="#">Біз туралы</a></li>
+  </ul>
+  <a href="#" class="nav-cart">Себет (0)</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grain"></div>
+  <div class="hero-line"></div>
+
+  <div class="hero-content">
+    <div class="hero-label">Уақыттың шеберлері · 2024 жинағы</div>
+    <h1 class="hero-title">
+      Уақыт —<br>
+      <em>өнер</em><br>
+      тілі
+    </h1>
+    <p class="hero-sub">Швейцарлық сағат шеберлігі. Әрбір секунд — анық. Әрбір сағат — мұра.</p>
+    <a href="#collection" class="hero-cta">
+      <span class="cta-line"></span>
+      Жинақты зерттеу
+    </a>
+  </div>
+
+  <!-- Decorative Watch SVG -->
+  <div class="hero-watch">
+    <svg class="watch-svg" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="faceGrad" cx="50%" cy="40%" r="60%">
+          <stop offset="0%" stop-color="#2a2520"/>
+          <stop offset="100%" stop-color="#0a0908"/>
+        </radialGradient>
+        <radialGradient id="rimGrad" cx="50%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#e8c878"/>
+          <stop offset="40%" stop-color="#c9a84c"/>
+          <stop offset="100%" stop-color="#6a5020"/>
+        </radialGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="6" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <radialGradient id="glassGrad" cx="40%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="rgba(255,255,255,0.08)"/>
+          <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+        </radialGradient>
+      </defs>
+
+      <!-- Strap top -->
+      <rect x="240" y="10" width="120" height="110" rx="16" fill="#181510"/>
+      <rect x="255" y="10" width="90" height="110" rx="12" fill="#1e1a12"/>
+      <line x1="270" y1="30" x2="270" y2="110" stroke="rgba(201,168,76,0.15)" stroke-width="1"/>
+      <line x1="300" y1="30" x2="300" y2="110" stroke="rgba(201,168,76,0.1)" stroke-width="1"/>
+      <line x1="330" y1="30" x2="330" y2="110" stroke="rgba(201,168,76,0.15)" stroke-width="1"/>
+
+      <!-- Strap bottom -->
+      <rect x="240" y="480" width="120" height="110" rx="16" fill="#181510"/>
+      <rect x="255" y="480" width="90" height="110" rx="12" fill="#1e1a12"/>
+      <line x1="270" y1="490" x2="270" y2="570" stroke="rgba(201,168,76,0.15)" stroke-width="1"/>
+      <line x1="300" y1="490" x2="300" y2="570" stroke="rgba(201,168,76,0.1)" stroke-width="1"/>
+      <line x1="330" y1="490" x2="330" y2="570" stroke="rgba(201,168,76,0.15)" stroke-width="1"/>
+
+      <!-- Crown -->
+      <rect x="458" y="270" width="32" height="60" rx="8" fill="url(#rimGrad)"/>
+      <rect x="462" y="280" width="24" height="40" rx="6" fill="#c9a84c"/>
+      <line x1="466" y1="288" x2="482" y2="288" stroke="rgba(0,0,0,0.3)" stroke-width="1.5"/>
+      <line x1="466" y1="296" x2="482" y2="296" stroke="rgba(0,0,0,0.3)" stroke-width="1.5"/>
+      <line x1="466" y1="304" x2="482" y2="304" stroke="rgba(0,0,0,0.3)" stroke-width="1.5"/>
+      <line x1="466" y1="312" x2="482" y2="312" stroke="rgba(0,0,0,0.3)" stroke-width="1.5"/>
+
+      <!-- Case outer -->
+      <circle cx="300" cy="300" r="195" fill="url(#rimGrad)" filter="url(#glow)"/>
+      <!-- Case bezel -->
+      <circle cx="300" cy="300" r="185" fill="#1a150e"/>
+      <!-- Bezel details -->
+      <circle cx="300" cy="300" r="182" fill="none" stroke="rgba(201,168,76,0.3)" stroke-width="0.5"/>
+      
+      <!-- Minute markers on bezel -->
+      <g stroke="#c9a84c" stroke-width="1.5">
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(0,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(6,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(12,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(18,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(24,300,300)"/>
+        <line x1="300" y1="115" x2="300" y2="130" transform="rotate(30,300,300)" stroke-width="2.5"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(36,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(42,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(48,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(54,300,300)"/>
+        <line x1="300" y1="115" x2="300" y2="130" transform="rotate(60,300,300)" stroke-width="2.5"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(66,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(72,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(78,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(84,300,300)"/>
+        <line x1="300" y1="115" x2="300" y2="130" transform="rotate(90,300,300)" stroke-width="2.5"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(96,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(102,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(108,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(114,300,300)"/>
+        <line x1="300" y1="115" x2="300" y2="130" transform="rotate(120,300,300)" stroke-width="2.5"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(126,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(132,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(138,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(144,300,300)"/>
+        <line x1="300" y1="115" x2="300" y2="130" transform="rotate(150,300,300)" stroke-width="2.5"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(156,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(162,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(168,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(174,300,300)"/>
+        <line x1="300" y1="115" x2="300" y2="130" transform="rotate(180,300,300)" stroke-width="2.5"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(186,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(192,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(198,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(204,300,300)"/>
+        <line x1="300" y1="115" x2="300" y2="130" transform="rotate(210,300,300)" stroke-width="2.5"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(216,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(222,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(228,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(234,300,300)"/>
+        <line x1="300" y1="115" x2="300" y2="130" transform="rotate(240,300,300)" stroke-width="2.5"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(246,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(252,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(258,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(264,300,300)"/>
+        <line x1="300" y1="115" x2="300" y2="130" transform="rotate(270,300,300)" stroke-width="2.5"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(276,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(282,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(288,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(294,300,300)"/>
+        <line x1="300" y1="115" x2="300" y2="130" transform="rotate(300,300,300)" stroke-width="2.5"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(306,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(312,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(318,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(324,300,300)"/>
+        <line x1="300" y1="115" x2="300" y2="130" transform="rotate(330,300,300)" stroke-width="2.5"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(336,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(342,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(348,300,300)"/>
+        <line x1="300" y1="118" x2="300" y2="128" transform="rotate(354,300,300)"/>
+      </g>
+
+      <!-- Watch face -->
+      <circle cx="300" cy="300" r="165" fill="url(#faceGrad)"/>
+      <circle cx="300" cy="300" r="162" fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="1"/>
+
+      <!-- Dial texture rings -->
+      <circle cx="300" cy="300" r="140" fill="none" stroke="rgba(201,168,76,0.08)" stroke-width="1"/>
+      <circle cx="300" cy="300" r="120" fill="none" stroke="rgba(201,168,76,0.05)" stroke-width="1"/>
+
+      <!-- Hour markers -->
+      <rect x="296" y="145" width="8" height="20" rx="2" fill="#c9a84c" transform="rotate(0,300,300)"/>
+      <rect x="296" y="145" width="8" height="20" rx="2" fill="#c9a84c" transform="rotate(30,300,300)"/>
+      <rect x="296" y="145" width="8" height="20" rx="2" fill="#c9a84c" transform="rotate(60,300,300)"/>
+      <rect x="296" y="145" width="8" height="20" rx="2" fill="#c9a84c" transform="rotate(90,300,300)"/>
+      <rect x="296" y="145" width="8" height="20" rx="2" fill="#c9a84c" transform="rotate(120,300,300)"/>
+      <rect x="296" y="145" width="8" height="20" rx="2" fill="#c9a84c" transform="rotate(150,300,300)"/>
+      <rect x="296" y="145" width="8" height="20" rx="2" fill="#c9a84c" transform="rotate(180,300,300)"/>
+      <rect x="296" y="145" width="8" height="20" rx="2" fill="#c9a84c" transform="rotate(210,300,300)"/>
+      <rect x="296" y="145" width="8" height="20" rx="2" fill="#c9a84c" transform="rotate(240,300,300)"/>
+      <rect x="296" y="145" width="8" height="20" rx="2" fill="#c9a84c" transform="rotate(270,300,300)"/>
+      <rect x="296" y="145" width="8" height="20" rx="2" fill="#c9a84c" transform="rotate(300,300,300)"/>
+      <rect x="296" y="145" width="8" height="20" rx="2" fill="#c9a84c" transform="rotate(330,300,300)"/>
+
+      <!-- Brand text -->
+      <text x="300" y="240" text-anchor="middle" fill="rgba(201,168,76,0.9)" font-family="Cinzel, serif" font-size="16" letter-spacing="6">CHRONOS</text>
+      <text x="300" y="260" text-anchor="middle" fill="rgba(201,168,76,0.45)" font-family="serif" font-size="9" letter-spacing="3">SWISS MADE</text>
+
+      <!-- Date window -->
+      <rect x="330" y="288" width="28" height="24" rx="2" fill="#0e0d0b" stroke="rgba(201,168,76,0.4)" stroke-width="1"/>
+      <text x="344" y="305" text-anchor="middle" fill="#e8c878" font-family="Arial" font-size="11" font-weight="bold">03</text>
+
+      <!-- Hour hand -->
+      <g id="hourHand" transform="rotate(315, 300, 300)">
+        <rect x="296.5" y="175" width="7" height="120" rx="3" fill="url(#rimGrad)"/>
+        <rect x="298" y="178" width="4" height="116" rx="2" fill="rgba(0,0,0,0.4)"/>
+      </g>
+
+      <!-- Minute hand -->
+      <g id="minuteHand" transform="rotate(180, 300, 300)">
+        <rect x="297.5" y="148" width="5" height="152" rx="2.5" fill="#e8c878"/>
+        <rect x="299" y="150" width="2" height="148" rx="1" fill="rgba(0,0,0,0.3)"/>
+      </g>
+
+      <!-- Second hand -->
+      <g id="secondHand" transform="rotate(90, 300, 300)">
+        <rect x="299.5" y="145" width="1.5" height="165" rx="1" fill="#ff4444"/>
+        <circle cx="300" cy="310" r="5" fill="none" stroke="#ff4444" stroke-width="1.5"/>
+      </g>
+
+      <!-- Center cap -->
+      <circle cx="300" cy="300" r="8" fill="url(#rimGrad)"/>
+      <circle cx="300" cy="300" r="4" fill="#0a0908"/>
+
+      <!-- Glass shine -->
+      <ellipse cx="260" cy="240" rx="60" ry="40" fill="url(#glassGrad)" transform="rotate(-20,260,240)"/>
+    </svg>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track" id="marquee">
+    <div class="marquee-item">Швейцарлық механизм</div>
+    <div class="marquee-item">Сапфир шыны</div>
+    <div class="marquee-item">316L болаты</div>
+    <div class="marquee-item">5 жыл кепілдік</div>
+    <div class="marquee-item">Тегін жеткізу</div>
+    <div class="marquee-item">Аутентикалық тауар</div>
+    <div class="marquee-item">Швейцарлық механизм</div>
+    <div class="marquee-item">Сапфир шыны</div>
+    <div class="marquee-item">316L болаты</div>
+    <div class="marquee-item">5 жыл кепілдік</div>
+    <div class="marquee-item">Тегін жеткізу</div>
+    <div class="marquee-item">Аутентикалық тауар</div>
+  </div>
+</div>
+
+<!-- COLLECTION -->
+<section class="section" id="collection">
+  <div class="section-header reveal">
+    <div>
+      <div class="section-label">Таңдаулы жинақ</div>
+      <h2 class="section-title">Биылғы<br><em>шедеврлер</em></h2>
+    </div>
+    <a href="#" class="view-all">Барлығын көру →</a>
+  </div>
+
+  <div class="watches-grid reveal">
+    <!-- Card 1 - Large -->
+    <div class="watch-card">
+      <div class="watch-visual">
+        <div class="watch-glow"></div>
+        <div class="watch-visual-inner">
+          <svg viewBox="0 0 280 280" width="220" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="f1" cx="50%" cy="40%" r="60%">
+                <stop offset="0%" stop-color="#1e1a12"/>
+                <stop offset="100%" stop-color="#080706"/>
+              </radialGradient>
+            </defs>
+            <circle cx="140" cy="140" r="120" fill="#b8902a"/>
+            <circle cx="140" cy="140" r="112" fill="#0e0c08"/>
+            <circle cx="140" cy="140" r="105" fill="url(#f1)"/>
+            <circle cx="140" cy="140" r="100" fill="none" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+            <g stroke="#c9a84c" stroke-width="2">
+              <line x1="140" y1="40" x2="140" y2="55" transform="rotate(0,140,140)"/>
+              <line x1="140" y1="40" x2="140" y2="55" transform="rotate(90,140,140)"/>
+              <line x1="140" y1="40" x2="140" y2="55" transform="rotate(180,140,140)"/>
+              <line x1="140" y1="40" x2="140" y2="55" transform="rotate(270,140,140)"/>
+            </g>
+            <text x="140" y="118" text-anchor="middle" fill="rgba(201,168,76,0.8)" font-family="serif" font-size="9" letter-spacing="3">PERPETUAL</text>
+            <rect x="137" y="78" width="6" height="55" rx="3" fill="#c9a84c" transform="rotate(330,140,140)"/>
+            <rect x="138" y="72" width="4" height="68" rx="2" fill="#e8d090" transform="rotate(180,140,140)"/>
+            <rect x="139.5" y="50" width="1.5" height="90" rx="1" fill="#cc3333" transform="rotate(90,140,140)"/>
+            <circle cx="140" cy="140" r="5" fill="#c9a84c"/>
+          </svg>
+        </div>
+      </div>
+      <div class="watch-info">
+        <div class="watch-brand">Rolex · Oyster</div>
+        <div class="watch-name">Perpetual Datejust</div>
+        <div class="watch-desc">36 мм · Автоматты механизм · Устерлік болат + алтын</div>
+        <div class="watch-price-row">
+          <div class="watch-price"><sup>₸</sup>2 850 000</div>
+          <button class="add-btn">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="watch-card">
+      <div class="watch-visual">
+        <div class="watch-glow"></div>
+        <div class="watch-visual-inner">
+          <svg viewBox="0 0 220 220" width="160" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="f2" cx="50%" cy="35%" r="65%">
+                <stop offset="0%" stop-color="#0d1520"/>
+                <stop offset="100%" stop-color="#040810"/>
+              </radialGradient>
+            </defs>
+            <circle cx="110" cy="110" r="95" fill="#1a2540"/>
+            <circle cx="110" cy="110" r="88" fill="url(#f2)"/>
+            <circle cx="110" cy="110" r="82" fill="none" stroke="rgba(100,140,220,0.3)" stroke-width="0.8"/>
+            <g fill="white" font-size="7">
+              <text x="110" y="40" text-anchor="middle" font-family="serif" letter-spacing="1" fill="rgba(255,255,255,0.6)">12</text>
+              <text x="180" y="114" text-anchor="middle" font-family="serif" letter-spacing="1" fill="rgba(255,255,255,0.6)">3</text>
+              <text x="110" y="186" text-anchor="middle" font-family="serif" letter-spacing="1" fill="rgba(255,255,255,0.6)">6</text>
+              <text x="40" y="114" text-anchor="middle" font-family="serif" letter-spacing="1" fill="rgba(255,255,255,0.6)">9</text>
+            </g>
+            <rect x="107" y="38" width="6" height="50" rx="3" fill="white" transform="rotate(330,110,110)"/>
+            <rect x="108" y="35" width="4" height="60" rx="2" fill="rgba(200,220,255,0.9)" transform="rotate(200,110,110)"/>
+            <rect x="109.5" y="28" width="1.5" height="82" rx="1" fill="#4499ff" transform="rotate(120,110,110)"/>
+            <circle cx="110" cy="110" r="4" fill="white"/>
+          </svg>
+        </div>
+      </div>
+      <div class="watch-info">
+        <div class="watch-brand">Omega · Seamaster</div>
+        <div class="watch-name">Planet Ocean</div>
+        <div class="watch-desc">42 мм · Co-Axial · Керамик безель</div>
+        <div class="watch-price-row">
+          <div class="watch-price"><sup>₸</sup>1 490 000</div>
+          <button class="add-btn">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="watch-card">
+      <div class="watch-visual">
+        <div class="watch-glow"></div>
+        <div class="watch-visual-inner">
+          <svg viewBox="0 0 220 220" width="160" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="f3" cx="50%" cy="40%" r="60%">
+                <stop offset="0%" stop-color="#1a1008"/>
+                <stop offset="100%" stop-color="#080400"/>
+              </radialGradient>
+            </defs>
+            <circle cx="110" cy="110" r="95" fill="#6a3010"/>
+            <circle cx="110" cy="110" r="88" fill="#100804"/>
+            <circle cx="110" cy="110" r="82" fill="url(#f3)"/>
+            <circle cx="110" cy="110" r="75" fill="none" stroke="rgba(180,90,20,0.4)" stroke-width="1"/>
+            <g stroke="rgba(201,120,50,0.8)" stroke-width="1.5">
+              <line x1="110" y1="32" x2="110" y2="45" transform="rotate(0,110,110)"/>
+              <line x1="110" y1="32" x2="110" y2="42" transform="rotate(30,110,110)"/>
+              <line x1="110" y1="32" x2="110" y2="45" transform="rotate(60,110,110)"/>
+              <line x1="110" y1="32" x2="110" y2="42" transform="rotate(90,110,110)"/>
+              <line x1="110" y1="32" x2="110" y2="45" transform="rotate(120,110,110)"/>
+              <line x1="110" y1="32" x2="110" y2="42" transform="rotate(150,110,110)"/>
+              <line x1="110" y1="32" x2="110" y2="45" transform="rotate(180,110,110)"/>
+              <line x1="110" y1="32" x2="110" y2="42" transform="rotate(210,110,110)"/>
+              <line x1="110" y1="32" x2="110" y2="45" transform="rotate(240,110,110)"/>
+              <line x1="110" y1="32" x2="110" y2="42" transform="rotate(270,110,110)"/>
+              <line x1="110" y1="32" x2="110" y2="45" transform="rotate(300,110,110)"/>
+              <line x1="110" y1="32" x2="110" y2="42" transform="rotate(330,110,110)"/>
+            </g>
+            <text x="110" y="82" text-anchor="middle" fill="rgba(200,140,60,0.7)" font-family="serif" font-size="7" letter-spacing="2">IWC</text>
+            <text x="110" y="94" text-anchor="middle" fill="rgba(200,140,60,0.5)" font-family="serif" font-size="5" letter-spacing="1">SCHAFFHAUSEN</text>
+            <rect x="107" y="42" width="6" height="52" rx="3" fill="rgba(200,140,60,0.9)" transform="rotate(0,110,110)"/>
+            <rect x="108" y="38" width="4" height="62" rx="2" fill="rgba(220,180,80,0.8)" transform="rotate(180,110,110)"/>
+            <rect x="109.5" y="30" width="1.5" height="80" rx="1" fill="#cc4400" transform="rotate(270,110,110)"/>
+            <circle cx="110" cy="110" r="4" fill="rgba(200,140,60,0.9)"/>
+          </svg>
+        </div>
+      </div>
+      <div class="watch-info">
+        <div class="watch-brand">IWC · Portugieser</div>
+        <div class="watch-name">Chronograph</div>
+        <div class="watch-desc">41 мм · Pellaton механизмі · Крокодил терісі</div>
+        <div class="watch-price-row">
+          <div class="watch-price"><sup>₸</sup>2 120 000</div>
+          <button class="add-btn">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="watch-card">
+      <div class="watch-visual">
+        <div class="watch-glow"></div>
+        <div class="watch-visual-inner">
+          <svg viewBox="0 0 220 220" width="160" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="f4" cx="50%" cy="35%" r="65%">
+                <stop offset="0%" stop-color="#101510"/>
+                <stop offset="100%" stop-color="#040808"/>
+              </radialGradient>
+            </defs>
+            <circle cx="110" cy="110" r="95" fill="#1a3020"/>
+            <circle cx="110" cy="110" r="88" fill="url(#f4)"/>
+            <circle cx="110" cy="110" r="82" fill="none" stroke="rgba(50,180,80,0.25)" stroke-width="1"/>
+            <g fill="rgba(80,200,100,0.8)" font-family="serif" font-size="8">
+              <text x="110" y="43" text-anchor="middle">XII</text>
+              <text x="176" y="115" text-anchor="middle">III</text>
+              <text x="110" y="184" text-anchor="middle">VI</text>
+              <text x="44" y="115" text-anchor="middle">IX</text>
+            </g>
+            <text x="110" y="78" text-anchor="middle" fill="rgba(80,200,100,0.6)" font-family="serif" font-size="6" letter-spacing="2">PATEK</text>
+            <text x="110" y="88" text-anchor="middle" fill="rgba(80,200,100,0.4)" font-family="serif" font-size="5" letter-spacing="1">PHILIPPE</text>
+            <rect x="107.5" y="44" width="5" height="52" rx="2.5" fill="rgba(80,200,100,0.9)" transform="rotate(330,110,110)"/>
+            <rect x="108.5" y="40" width="3" height="62" rx="1.5" fill="rgba(120,220,140,0.8)" transform="rotate(180,110,110)"/>
+            <rect x="109.5" y="30" width="1.5" height="80" rx="1" fill="#22aa44" transform="rotate(90,110,110)"/>
+            <circle cx="110" cy="110" r="3.5" fill="rgba(80,200,100,0.9)"/>
+          </svg>
+        </div>
+      </div>
+      <div class="watch-info">
+        <div class="watch-brand">Patek Philippe · Calatrava</div>
+        <div class="watch-name">Ref. 5227G</div>
+        <div class="watch-desc">39 мм · Cal. 324 · 18K ақ алтын</div>
+        <div class="watch-price-row">
+          <div class="watch-price"><sup>₸</sup>7 800 000</div>
+          <button class="add-btn">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PHILOSOPHY -->
+<section class="philosophy">
+  <div class="philosophy-bg-text">УАҚЫТ</div>
+  <div class="philosophy-inner">
+    <div class="philosophy-text reveal">
+      <div class="section-label">Біздің философия</div>
+      <blockquote class="philosophy-quote">
+        Сағат — бұл жай уақыт емес,<br>
+        ол — <em>мәңгіліктің</em><br>
+        сезімі
+      </blockquote>
+      <p class="philosophy-body">
+        Жиырма жылдан астам уақыт бойы біз Қазақстанға әлемнің үздік сағат брендтерін алып келдік. Әрбір сағат аутентикалық және кепілдіктен өткен.
+      </p>
+    </div>
+    <div class="stats-grid reveal">
+      <div class="stat-box">
+        <div class="stat-number">1200<sup style="font-size:1.5rem">+</sup></div>
+        <div class="stat-label">Модель</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">20</div>
+        <div class="stat-label">Жыл тәжірибе</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">45<sup style="font-size:1.5rem">+</sup></div>
+        <div class="stat-label">Бренд</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">8К<sup style="font-size:1.5rem">+</sup></div>
+        <div class="stat-label">Сатып алушы</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BANNER -->
+<section class="banner">
+  <div class="banner-inner reveal">
+    <div>
+      <h2 class="banner-title">Жаңа <em>маусымдық</em><br>жинақ келді</h2>
+      <p class="banner-text">2024 жылдың ең ерекше модельдері. Шектеулі санда. Арнайы бағамен алыңыз.</p>
+      <a href="#" class="gold-btn">Жинақты ашу →</a>
+    </div>
+    <div class="banner-features">
+      <div class="feature-item">
+        <div class="feature-icon">✦</div>
+        <div>
+          <div class="feature-title">100% Аутентикалық</div>
+          <div class="feature-desc">Барлық сағаттар тікелей брендтің ресми дистрибьюторынан</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">◈</div>
+        <div>
+          <div class="feature-title">Тегін жеткізу</div>
+          <div class="feature-desc">Қазақстанның барлық қалаларына сақтандырылған жеткізу</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">◉</div>
+        <div>
+          <div class="feature-title">5 жыл кепілдік</div>
+          <div class="feature-desc">Ресми сервис орталықтары арқылы кепілдік қызмет</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <a href="#" class="logo">CHRONOS<span> ◆</span></a>
+      <p class="footer-tagline">"Уақытты тоқтата алмассың,<br>бірақ оны сезіне аласың."</p>
+    </div>
+    <div class="footer-col">
+      <h4>Коллекция</h4>
+      <ul>
+        <li><a href="#">Ерлер сағаттары</a></li>
+        <li><a href="#">Әйелдер сағаттары</a></li>
+        <li><a href="#">Спорт сағаттары</a></li>
+        <li><a href="#">Классикалық</a></li>
+        <li><a href="#">Жаңа келімдер</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Брендтер</h4>
+      <ul>
+        <li><a href="#">Rolex</a></li>
+        <li><a href="#">Omega</a></li>
+        <li><a href="#">Patek Philippe</a></li>
+        <li><a href="#">IWC</a></li>
+        <li><a href="#">Cartier</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Байланыс</h4>
+      <ul>
+        <li><a href="#">Алматы, Достық 180</a></li>
+        <li><a href="#">+7 (727) 000-00-00</a></li>
+        <li><a href="#">info@chronos.kz</a></li>
+        <li><a href="#">Жеткізу шарттары</a></li>
+        <li><a href="#">Кепілдік</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2024 CHRONOS Kazakhstan. Барлық құқықтар қорғалған.</p>
+    <div class="footer-socials">
+      <a href="#">In</a>
+      <a href="#">Ig</a>
+      <a href="#">Tk</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+  function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => ring.classList.add('hover'));
+    el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+  reveals.forEach(r => obs.observe(r));
+
+  // Live clock on hero watch
+  function updateClock() {
+    const now = new Date();
+    const h = now.getHours() % 12;
+    const m = now.getMinutes();
+    const s = now.getSeconds();
+    const hDeg = h * 30 + m * 0.5;
+    const mDeg = m * 6 + s * 0.1;
+    const sDeg = s * 6;
+    const hHand = document.getElementById('hourHand');
+    const mHand = document.getElementById('minuteHand');
+    const sHand = document.getElementById('secondHand');
+    if (hHand) hHand.setAttribute('transform', `rotate(${hDeg}, 300, 300)`);
+    if (mHand) mHand.setAttribute('transform', `rotate(${mDeg}, 300, 300)`);
+    if (sHand) sHand.setAttribute('transform', `rotate(${sDeg}, 300, 300)`);
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // Parallax on hero watch
+  document.addEventListener('mousemove', e => {
+    const watch = document.querySelector('.hero-watch');
+    if (!watch) return;
+    const x = (e.clientX / window.innerWidth - 0.5) * 20;
+    const y = (e.clientY / window.innerHeight - 0.5) * 10;
+    watch.style.transform = `translateY(calc(-50% + ${y}px)) translateX(${x * 0.3}px) rotate(${x * 0.1}deg)`;
+  });
+</script>
+</body>
+</html>
